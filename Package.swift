@@ -23,7 +23,7 @@ let package = Package(
   products: [
     .library(
       name: "LiteRTLM",
-      targets: ["LiteRTLM"]
+      targets: ["LiteRTLM", "CLiteRTLM"]
     )
   ],
   targets: [
