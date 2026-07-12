@@ -56,9 +56,6 @@ let package = Package(
         "MessageTests.swift",
         "BUILD",
         "Info.plist",
-      ],
-      linkerSettings: [
-        .unsafeFlags(["-Xlinker", "-all_load"])
       ]
     ),
     // Separate test targets for each file to avoid naming conflicts:
