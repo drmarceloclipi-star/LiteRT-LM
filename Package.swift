@@ -19,7 +19,6 @@ let package = Package(
   name: "LiteRTLM",
   platforms: [
     .iOS(.v15),
-    .macOS(.v12),
   ],
   products: [
     .library(

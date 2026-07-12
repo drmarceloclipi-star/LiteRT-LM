@@ -9,7 +9,8 @@ Apache-2.0 licensing is retained from the upstream project.
 
 ## Compatibility changes
 
-1. Removed `prebuilt/android_arm64` and `prebuilt/android_x86_64`.
-2. Removed LiteRTLM's package-level unsafe `-all_load` linker setting.
+1. `Package.swift` is an iOS-only Swift Package shim that downloads the upstream `CLiteRTLM` XCFramework from its release URL.
+2. Removed all repository prebuilt-library LFS payloads; the package does not use them.
+3. Removed LiteRTLM's package-level unsafe `-all_load` linker setting.
 
 Purpose: provide a controlled, reproducible Swift Package dependency for Jourmingo's iOS integration. Jourmingo applies `-all_load` only in its app target build settings.
