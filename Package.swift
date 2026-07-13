@@ -28,11 +28,16 @@ let package = Package(
     )
   ],
   targets: [
-    // The Prebuilt Binary Target for iOS
+    // iOS runtime built from the C API path validated in mao-no-ar.  The
+    // upstream v0.13.0 XCFramework bundled by the v0.13.1 package crashes
+    // while parsing Gemma 4 E2B's visual encoder on current iOS.
     .binaryTarget(
       name: "CLiteRTLM",
-      url: "https://github.com/google-ai-edge/LiteRT-LM/releases/download/v0.13.0/CLiteRTLM.xcframework.zip",
-      checksum: "af23c77b8eae3f1888fc0348c133af8a13f1e8a89f5788de7e38457f512e768a"
+      path: "Runtime/CLiteRTLM.xcframework"
+    ),
+    .binaryTarget(
+      name: "GemmaConstraintProvider",
+      path: "Runtime/GemmaConstraintProvider.xcframework"
     ),
     // The Prebuilt Binary Target for Mac
     .binaryTarget(
@@ -45,11 +50,13 @@ let package = Package(
       name: "LiteRTLM",
       dependencies: [
         .target(name: "CLiteRTLM", condition: .when(platforms: [.iOS])),
+        .target(name: "GemmaConstraintProvider", condition: .when(platforms: [.iOS])),
         .target(name: "CLiteRTLM_mac", condition: .when(platforms: [.macOS]))
       ],
       path: "swift",
       exclude: [
         "CapabilitiesTests.swift",
+        "Capabilities.swift",
         "EngineTests.swift",
         "ConversationTests.swift",
         "ToolTests.swift",
