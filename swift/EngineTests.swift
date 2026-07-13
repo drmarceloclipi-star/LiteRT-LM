@@ -53,6 +53,17 @@ class EngineTests: XCTestCase {
     }
   }
 
+  func testEngineConfigThrowsErrorWithInvalidMaxNumImages() throws {
+    XCTAssertThrowsError(
+      try EngineConfig(
+        modelPath: "model", maxNumImages: -1, cacheDir: NSTemporaryDirectory())
+    ) { error in
+      XCTAssertEqual(
+        error as? LiteRTLMError,
+        LiteRTLMError.config(.invalidMaxNumImages(count: -1)))
+    }
+  }
+
   func testIsInitialized_IsFalseForNewEngine() async throws {
     let modelResource =
       "runtime/testdata/test_lm_new_metadata.task"

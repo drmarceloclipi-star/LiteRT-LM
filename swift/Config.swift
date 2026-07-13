@@ -54,6 +54,9 @@ public struct EngineConfig {
   /// The maximum number of the sum of input and output tokens. It is equivalent
   /// to the size of the kv-cache. When `nil`, use the default value from the model or the engine.
   public let maxNumTokens: Int?
+  /// The maximum number of image inputs accepted by the engine. When `nil`, use
+  /// the runtime default.
+  public let maxNumImages: Int?
   /// The directory for placing cache files. It should be a directory where the
   /// application has write access. If `nil`, it uses the directory of the `modelPath`.
   public let cacheDir: String?
@@ -68,6 +71,8 @@ public struct EngineConfig {
   ///   - maxNumTokens: The maximum number of the sum of input and output tokens. It is
   ///     equivalent to the size of the kv-cache. When `nil`, use the default value from the
   ///     model or the engine.
+  ///   - maxNumImages: The maximum number of image inputs accepted by the engine. When `nil`,
+  ///     use the runtime default.
   ///   - cacheDir: The directory for placing cache files. It should be a directory where the
   ///     application has write access. If `nil`, it uses the directory of the `modelPath`.
   /// - Throws: `LiteRTLMError` if `maxNumTokens` is less than or equal to 0.
@@ -75,16 +80,21 @@ public struct EngineConfig {
     modelPath: String, backend: Backend = .cpu(), visionBackend: Backend? = nil,
     audioBackend: Backend? = nil,
     maxNumTokens: Int? = nil,
+    maxNumImages: Int? = nil,
     cacheDir: String? = nil
   ) throws {
     if let maxNumTokens, maxNumTokens <= 0 {
       throw LiteRTLMError.config(.invalidMaxNumTokens)
+    }
+    if let maxNumImages, maxNumImages < 0 || maxNumImages > Int(Int32.max) {
+      throw LiteRTLMError.config(.invalidMaxNumImages(count: maxNumImages))
     }
     self.modelPath = modelPath
     self.backend = backend
     self.visionBackend = visionBackend
     self.audioBackend = audioBackend
     self.maxNumTokens = maxNumTokens
+    self.maxNumImages = maxNumImages
     self.cacheDir = cacheDir
   }
 }
