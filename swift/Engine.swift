@@ -47,6 +47,28 @@ public actor Engine {
     return handle != nil
   }
 
+  /// Counts tokens in a fully rendered prompt with this engine's native tokenizer.
+  ///
+  /// The input must already contain the exact prompt text that will be sent to the
+  /// model, including any chat template, tool descriptions, and extra context.
+  /// This method does not apply a prompt template or mutate a conversation.
+  ///
+  /// - Parameter renderedPrompt: The exact UTF-8 prompt to count.
+  /// - Returns: The number of model tokens in `renderedPrompt`.
+  /// - Throws: A `LiteRTLMError` when the engine is unavailable or tokenization fails.
+  public func tokenCount(for renderedPrompt: String) throws -> Int {
+    guard let handle else {
+      throw LiteRTLMError.engine(.notInitialized)
+    }
+
+    guard let result = litert_lm_engine_tokenize(handle, renderedPrompt) else {
+      throw LiteRTLMError.engine(.failedToTokenizePrompt)
+    }
+    defer { litert_lm_tokenize_result_delete(result) }
+
+    return Int(litert_lm_tokenize_result_get_num_tokens(result))
+  }
+
   /// Initializes the native LiteRT-LM engine.
   ///
   /// **Note:** This operation can take a significant amount of time (e.g., 10 seconds) depending on

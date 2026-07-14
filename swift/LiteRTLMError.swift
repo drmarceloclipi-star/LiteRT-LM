@@ -37,6 +37,7 @@ public enum LiteRTLMError: Error, LocalizedError, Equatable {
     case alreadyInitialized
     case failedToCreateSettings
     case failedToCreateEngine
+    case failedToTokenizePrompt
     case notInitialized
     case failedToCreateSessionConfig
     case failedToCreateConversationConfig
@@ -54,6 +55,8 @@ public enum LiteRTLMError: Error, LocalizedError, Equatable {
         return "Failed to create engine settings."
       case .failedToCreateEngine:
         return "Failed to create engine."
+      case .failedToTokenizePrompt:
+        return "Failed to tokenize prompt."
       case .notInitialized:
         return "Engine is not initialized."
       case .failedToCreateSessionConfig:

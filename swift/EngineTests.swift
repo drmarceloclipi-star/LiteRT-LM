@@ -81,6 +81,40 @@ class EngineTests: XCTestCase {
     XCTAssertTrue(isInitialized)
   }
 
+  func testTokenCount_UsesNativeTokenizer() async throws {
+    // swift-format-ignore
+    let modelResource =
+      "runtime/testdata/test_lm_new_metadata.task"
+    let modelPath = testDataPath(forResource: modelResource)
+    let engineConfig = try EngineConfig(
+      modelPath: modelPath, maxNumTokens: 16, cacheDir: NSTemporaryDirectory())
+    let engine = Engine(engineConfig: engineConfig)
+    try await engine.initialize()
+
+    let emptyCount = try await engine.tokenCount(for: "")
+    let promptCount = try await engine.tokenCount(for: "Count this rendered prompt.")
+
+    XCTAssertEqual(emptyCount, 0)
+    XCTAssertGreaterThan(promptCount, 0)
+  }
+
+  func testTokenCount_ThrowsBeforeInitialization() async throws {
+    // swift-format-ignore
+    let modelResource =
+      "runtime/testdata/test_lm_new_metadata.task"
+    let modelPath = testDataPath(forResource: modelResource)
+    let engineConfig = try EngineConfig(
+      modelPath: modelPath, maxNumTokens: 16, cacheDir: NSTemporaryDirectory())
+    let engine = Engine(engineConfig: engineConfig)
+
+    do {
+      _ = try await engine.tokenCount(for: "prompt")
+      XCTFail("Token counting must require an initialized engine.")
+    } catch let error as LiteRTLMError {
+      XCTAssertEqual(error, LiteRTLMError.engine(.notInitialized))
+    }
+  }
+
   func testInitialize_ThrowsIfCalledTwice() async throws {
     // swift-format-ignore
     let modelResource =
