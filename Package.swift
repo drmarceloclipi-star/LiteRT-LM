@@ -31,8 +31,8 @@ let package = Package(
     // The Prebuilt Binary Target for iOS
     .binaryTarget(
       name: "CLiteRTLM",
-      url: "https://github.com/google-ai-edge/LiteRT-LM/releases/download/v0.14.0/CLiteRTLM.xcframework.zip",
-      checksum: "dddac2f6713ed65eaf01c18e115d9fec22184adf575cc7856a21387e8ba937e1"
+      url: "https://github.com/drmarceloclipi-star/LiteRT-LM/releases/download/0.14.0-jourmingo.4/CLiteRTLM.xcframework.zip",
+      checksum: "7b78711fc9617ffaa1be36ce3525948d02a71b72b2428355b160ce4937ee3a5a"
     ),
     // The Prebuilt Binary Target for Mac
     .binaryTarget(
