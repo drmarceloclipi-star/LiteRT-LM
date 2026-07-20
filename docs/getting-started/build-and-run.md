@@ -75,6 +75,9 @@ and package the iOS binary with:
 The script enables Bazel dSYM generation and verifies non-empty DWARF data plus
 matching framework/dSYM UUIDs for device and simulator. It embeds the device
 dSYM required for App Store crash symbolication and prints the SwiftPM checksum.
+The iOS package disables the separately distributed FST constraint-provider
+dylib so the resulting framework remains self-contained; the script rejects an
+artifact that retains that runtime dependency.
 Keep the checkout and Bazel output paths free of spaces because the current Rust
 build wrappers do not handle them.
 

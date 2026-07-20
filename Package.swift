@@ -31,8 +31,8 @@ let package = Package(
     // The Prebuilt Binary Target for iOS
     .binaryTarget(
       name: "CLiteRTLM",
-      url: "https://github.com/drmarceloclipi-star/LiteRT-LM/releases/download/0.14.0-jourmingo.5/CLiteRTLM.xcframework.zip",
-      checksum: "571042d4c1a4dff827434cc37e471501b684fd44bf3b6be86b9c27bc2c2fa025"
+      url: "https://github.com/drmarceloclipi-star/LiteRT-LM/releases/download/0.14.0-jourmingo.6/CLiteRTLM.xcframework.zip",
+      checksum: "48f772c00b27ae4a546286bc62ed13a1a5344c04f78267672331d57f9ba3c1d3"
     ),
     // The Prebuilt Binary Target for Mac
     .binaryTarget(
