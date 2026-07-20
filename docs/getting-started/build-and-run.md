@@ -72,10 +72,11 @@ and package the iOS binary with:
 ./swift/build_clitertlm_xcframework_with_dsyms.sh /path/to/artifacts
 ```
 
-The script enables Bazel dSYM generation, verifies non-empty DWARF data and
-matching framework/dSYM UUIDs for device and simulator, embeds both dSYMs in the
-XCFramework, and prints the SwiftPM checksum. Keep the checkout and Bazel output
-paths free of spaces because the current Rust build wrappers do not handle them.
+The script enables Bazel dSYM generation and verifies non-empty DWARF data plus
+matching framework/dSYM UUIDs for device and simulator. It embeds the device
+dSYM required for App Store crash symbolication and prints the SwiftPM checksum.
+Keep the checkout and Bazel output paths free of spaces because the current Rust
+build wrappers do not handle them.
 
 #### Install Bazel
 

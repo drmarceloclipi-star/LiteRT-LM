@@ -94,7 +94,6 @@ xcodebuild -create-xcframework \
   -framework "${DEVICE_FRAMEWORK}" \
   -debug-symbols "${DEVICE_DSYM}" \
   -framework "${SIMULATOR_FRAMEWORK}" \
-  -debug-symbols "${SIMULATOR_DSYM}" \
   -output "${XCFRAMEWORK_PATH}"
 
 # SwiftPM hashes the complete archive. Fixed timestamps make identical inputs
