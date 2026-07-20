@@ -63,6 +63,20 @@ git checkout -b <my-feature-branch> <release-tag, e.g. "v0.8.0">
 
 You are now on a local branch created from the tag and ready to work.
 
+#### Build the iOS XCFramework with dSYMs
+
+Release archives need UUID-matched dSYMs for symbolicated crash reports. Build
+and package the iOS binary with:
+
+```bash
+./swift/build_clitertlm_xcframework_with_dsyms.sh /path/to/artifacts
+```
+
+The script enables Bazel dSYM generation, verifies non-empty DWARF data and
+matching framework/dSYM UUIDs for device and simulator, embeds both dSYMs in the
+XCFramework, and prints the SwiftPM checksum. Keep the checkout and Bazel output
+paths free of spaces because the current Rust build wrappers do not handle them.
+
 #### Install Bazel
 
 This project requires Bazel version **7.6.1**. You can skip this if you already
