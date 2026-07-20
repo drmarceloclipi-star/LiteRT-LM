@@ -12,7 +12,7 @@ if [[ "${REPO_ROOT}" == *" "* ]]; then
 fi
 
 BAZEL_STARTUP_ARGS=()
-BAZEL_COMMON_ARGS=()
+BAZEL_COMMON_ARGS=("--define=LITERT_LM_FST_CONSTRAINTS_DISABLED=1")
 
 if [[ -n "${CLITERTLM_BAZEL_OUTPUT_USER_ROOT:-}" ]]; then
   BAZEL_STARTUP_ARGS+=("--output_user_root=${CLITERTLM_BAZEL_OUTPUT_USER_ROOT}")
@@ -81,8 +81,21 @@ verify_symbol_pair() {
   echo "verified ${framework_uuid}: ${framework_binary}"
 }
 
+verify_self_contained() {
+  local framework_binary="$1"
+  local runtime_dependencies
+
+  runtime_dependencies="$(otool -L "${framework_binary}")"
+  if grep -Fq '@rpath/libGemmaModelConstraintProvider.dylib' <<<"${runtime_dependencies}"; then
+    echo "error: framework requires an unbundled Gemma constraint-provider dylib: ${framework_binary}" >&2
+    exit 1
+  fi
+}
+
 verify_symbol_pair "${DEVICE_FRAMEWORK}/CLiteRTLM" "${DEVICE_DWARF}"
 verify_symbol_pair "${SIMULATOR_FRAMEWORK}/CLiteRTLM" "${SIMULATOR_DWARF}"
+verify_self_contained "${DEVICE_FRAMEWORK}/CLiteRTLM"
+verify_self_contained "${SIMULATOR_FRAMEWORK}/CLiteRTLM"
 
 mkdir -p "${ARTIFACT_DIR}"
 
@@ -96,13 +109,38 @@ xcodebuild -create-xcframework \
   -framework "${SIMULATOR_FRAMEWORK}" \
   -output "${XCFRAMEWORK_PATH}"
 
+# xcodebuild may emit AvailableLibraries in either order. Canonicalize the
+# manifest before hashing the SwiftPM archive.
+plutil -replace AvailableLibraries -json '[
+  {
+    "BinaryPath": "CLiteRTLM.framework/CLiteRTLM",
+    "DebugSymbolsPath": "dSYMs",
+    "LibraryIdentifier": "ios-arm64",
+    "LibraryPath": "CLiteRTLM.framework",
+    "SupportedArchitectures": ["arm64"],
+    "SupportedPlatform": "ios"
+  },
+  {
+    "BinaryPath": "CLiteRTLM.framework/CLiteRTLM",
+    "LibraryIdentifier": "ios-arm64-simulator",
+    "LibraryPath": "CLiteRTLM.framework",
+    "SupportedArchitectures": ["arm64"],
+    "SupportedPlatform": "ios",
+    "SupportedPlatformVariant": "simulator"
+  }
+]' "${XCFRAMEWORK_PATH}/Info.plist"
+plutil -convert xml1 "${XCFRAMEWORK_PATH}/Info.plist"
+
 # SwiftPM hashes the complete archive. Fixed timestamps make identical inputs
 # produce an identical release checksum.
 find "${XCFRAMEWORK_PATH}" -exec touch -h -t 198001010000 {} +
 
 (
   cd "${WORK_DIR}"
-  COPYFILE_DISABLE=1 /usr/bin/zip -q -r -X "${STAGED_ZIP_PATH}" CLiteRTLM.xcframework
+  export COPYFILE_DISABLE=1
+  find CLiteRTLM.xcframework \( -type f -o -type l \) -print \
+    | LC_ALL=C sort \
+    | /usr/bin/zip -q -X -y "${STAGED_ZIP_PATH}" -@
 )
 
 mv -f "${STAGED_ZIP_PATH}" "${ZIP_PATH}"
