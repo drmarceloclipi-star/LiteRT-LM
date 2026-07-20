@@ -12,7 +12,7 @@ if [[ "${REPO_ROOT}" == *" "* ]]; then
 fi
 
 BAZEL_STARTUP_ARGS=()
-BAZEL_COMMON_ARGS=()
+BAZEL_COMMON_ARGS=("--define=LITERT_LM_FST_CONSTRAINTS_DISABLED=1")
 
 if [[ -n "${CLITERTLM_BAZEL_OUTPUT_USER_ROOT:-}" ]]; then
   BAZEL_STARTUP_ARGS+=("--output_user_root=${CLITERTLM_BAZEL_OUTPUT_USER_ROOT}")
@@ -28,7 +28,6 @@ bazel "${BAZEL_STARTUP_ARGS[@]}" build \
   "${BAZEL_COMMON_ARGS[@]}" \
   --apple_generate_dsym \
   --output_groups=+dsyms \
-  --define=LITERT_LM_FST_CONSTRAINTS_DISABLED=1 \
   //swift:CLiteRTLM
 
 BAZEL_BIN="$(bazel "${BAZEL_STARTUP_ARGS[@]}" info "${BAZEL_COMMON_ARGS[@]}" bazel-bin)"
