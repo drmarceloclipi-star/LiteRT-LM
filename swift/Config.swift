@@ -159,6 +159,10 @@ public struct ConversationConfig {
   // If `nil`, then uses the engine's default values.
   public let samplerConfig: SamplerConfig?
 
+  // Maximum number of tokens generated for each response.
+  // If `nil`, then uses the engine's default value.
+  public let maxOutputTokens: Int?
+
   // The file path to the Text LoRA weights file.
   public let loraPath: String?
 
@@ -172,6 +176,8 @@ public struct ConversationConfig {
   ///   - tools: The list of tool instances to be used in the conversation.
   ///   - samplerConfig: Configuration for the sampling process. If `nil`, then uses the engine's
   ///     default values.
+  ///   - maxOutputTokens: Maximum number of tokens generated for each response. If `nil`, then
+  ///     uses the engine's default value.
   ///   - loraPath: The file path to the Text LoRA weights file.
   ///   - audioLoraPath: The file path to the Audio LoRA weights file.
   ///   - enableToolCallStreaming: Whether to enable conversation tool call streaming.
@@ -180,6 +186,7 @@ public struct ConversationConfig {
     initialMessages: [Message] = [],
     tools: [Tool] = [],
     samplerConfig: SamplerConfig? = nil,
+    maxOutputTokens: Int? = nil,
     loraPath: String? = nil,
     audioLoraPath: String? = nil,
     enableToolCallStreaming: Bool = false
@@ -194,6 +201,7 @@ public struct ConversationConfig {
     self.initialMessages = initialMessages
     self.tools = tools
     self.samplerConfig = samplerConfig
+    self.maxOutputTokens = maxOutputTokens
     self.loraPath = loraPath
     self.audioLoraPath = audioLoraPath
     self.enableToolCallStreaming = enableToolCallStreaming
