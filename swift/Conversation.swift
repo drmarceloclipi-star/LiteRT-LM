@@ -403,6 +403,8 @@ public class Conversation {
   class StreamContext {
     let continuation: AsyncThrowingStream<Message, Error>.Continuation
     let conversation: Conversation
+    let callbackQueue = DispatchQueue(
+      label: "com.google.ai.edge.litertlm.swift.conversation-callback-\(UUID().uuidString)")
     var toolCallCount: Int = 0
     var pendingToolCalls: [[String: Any]] = []
 
@@ -426,9 +428,31 @@ private func streamCallback(
   guard let userData = userData else { return }
 
   let context = Unmanaged<Conversation.StreamContext>.fromOpaque(userData).takeUnretainedValue()
+  let userDataAddress = UInt(bitPattern: userData)
+  let responseString = responseJson.map(String.init(cString:))
+  let errorString = errorMessage.map(String.init(cString:))
 
-  if let errorMessage = errorMessage {
-    let errorString = String(cString: errorMessage)
+  context.callbackQueue.async {
+    handleStreamCallback(
+      context: context,
+      userDataAddress: userDataAddress,
+      responseString: responseString,
+      isFinal: isFinal,
+      errorString: errorString
+    )
+  }
+}
+
+private func handleStreamCallback(
+  context: Conversation.StreamContext,
+  userDataAddress: UInt,
+  responseString: String?,
+  isFinal: Bool,
+  errorString: String?
+) {
+  guard let userData = UnsafeMutableRawPointer(bitPattern: userDataAddress) else { return }
+
+  if let errorString {
     let error = LiteRTLMError.conversation(.invalidResponse(errorString))
     context.continuation.finish(throwing: error)
 
@@ -436,8 +460,7 @@ private func streamCallback(
     return
   }
 
-  if let responseJson = responseJson {
-    let responseString = String(cString: responseJson)
+  if let responseString {
     do {
       guard let responseData = responseString.data(using: .utf8),
         let jsonObject = try JSONSerialization.jsonObject(with: responseData) as? [String: Any]

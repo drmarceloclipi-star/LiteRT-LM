@@ -50,6 +50,24 @@ class ConversationTests: XCTestCase {
     XCTAssertTrue(conversation.isAlive)
   }
 
+  func testConversationConfigStoresMaxOutputTokens() {
+    let config = ConversationConfig(maxOutputTokens: 256)
+
+    XCTAssertEqual(config.maxOutputTokens, 256)
+  }
+
+  func testConversationHonorsMaxOutputTokens() async throws {
+    let conversation = try await self.engine.createConversation(
+      with: ConversationConfig(maxOutputTokens: 1))
+
+    var chunkCount = 0
+    for try await _ in conversation.sendMessageStream(Message("Write a long answer.")) {
+      chunkCount += 1
+    }
+
+    XCTAssertLessThanOrEqual(chunkCount, 1)
+  }
+
   func testConversationConfigSystemMessageSerialization() throws {
     let config = ConversationConfig(
       systemMessage: Message("Talk like a pirate", role: .system))

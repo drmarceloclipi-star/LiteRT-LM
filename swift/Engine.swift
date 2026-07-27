@@ -215,6 +215,10 @@ public actor Engine {
       litert_lm_session_config_set_sampler_params(cSessionConfig, cSamplerParams)
     }
 
+    if let maxOutputTokens = conversationConfig.maxOutputTokens, maxOutputTokens > 0 {
+      litert_lm_session_config_set_max_output_tokens(cSessionConfig, Int32(maxOutputTokens))
+    }
+
     if let loraPath = conversationConfig.loraPath {
       let status = litert_lm_session_config_set_lora_path(cSessionConfig, loraPath)
       guard status == 0 else {
